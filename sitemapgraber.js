@@ -169,3 +169,74 @@ function downloadTextFile(urls) {
 
 // Call the function to execute
 grabAndCleanAnchorValues();
+
+
+
+
+grab all sitemap data 
+// Function to clean URLs: remove base URL, clean dashes, and handle the title formatting
+function grabAndCleanAnchorValues() {
+  // Define the base part of the URL to remove
+  const baseToRemove = 'https://www.watch-movies.com.pk/';
+  
+  // Store cleaned URLs to create a text file
+  let cleanedUrls = [];
+
+  // Find the element with ID 'sitemap'
+  const sitemapElement = document.getElementById('sitemap');
+  
+  if (sitemapElement) {
+    // Find all <a> tags within the sitemap element
+    const anchorTags = sitemapElement.querySelectorAll('a');
+
+    if (anchorTags.length > 0) {
+      // Iterate over each <a> tag and clean the href
+      anchorTags.forEach((anchor) => {
+        // Extract the title and clean it
+        let cleanedHref = anchor.href.replace(baseToRemove, '');
+
+        // Remove any consecutive dashes, replace them with a single space
+        cleanedHref = cleanedHref.replace(/-+/g, ' ');
+
+        // Remove any leading/trailing dashes or spaces
+        cleanedHref = cleanedHref.trim().replace(/^-+|-+$/g, '');
+
+        // Capture everything before the year (4 digits)
+        const title = cleanedHref.split(/\s\d{4}/)[0]; // Split at first 4 digits (year)
+
+        // Add the movie title and the original anchor href (URL) to separate lines
+        cleanedUrls.push(title);
+        cleanedUrls.push(anchor.href); // Use the full anchor href directly
+      });
+
+      // After processing all URLs, create and download the text file
+      downloadTextFile(cleanedUrls);
+    } else {
+      console.log('No <a> tags found inside the element with ID "sitemap".');
+    }
+  } else {
+    console.log('Element with ID "sitemap" not found.');
+  }
+}
+
+// Function to download the cleaned URLs as a text file
+function downloadTextFile(urls) {
+  // Create a Blob with the cleaned URLs
+  const blob = new Blob([urls.join('\n')], { type: 'text/plain' });
+
+  // Create a link element
+  const link = document.createElement('a');
+  
+  // Set the download attribute with a filename
+  link.download = 'cleaned_urls.txt';
+
+  // Create a URL for the Blob and set it as the href
+  link.href = URL.createObjectURL(blob);
+
+  // Trigger a click event to download the file
+  link.click();
+}
+
+// Call the function to execute
+grabAndCleanAnchorValues();
+
