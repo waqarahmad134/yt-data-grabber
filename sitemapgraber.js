@@ -109,10 +109,10 @@ function grabAndCleanAnchorValues() {
 
     if (anchorTags.length > 0) {
       // Iterate over each <a> tag and clean the href
-      anchorTags.forEach((anchor, index) => {
+      anchorTags.forEach((anchor) => {
         // Only process links that contain '2024'
         if (anchor.href.includes('2024')) {
-          // Remove the base part of the URL
+          // Extract the title and clean it
           let cleanedHref = anchor.href.replace(baseToRemove, '');
 
           // Apply regex to clean anything after the year
@@ -121,22 +121,21 @@ function grabAndCleanAnchorValues() {
             cleanedHref = match[0].trim(); // Cleaned part up to the year
           }
 
-          // Replace dash before the year with a space (fix for cleaning)
+          // Remove any dashes before the year and replace them with spaces
           cleanedHref = cleanedHref.replace(/-(?=\d{4}$)/, ' ');
 
-          // Remove consecutive dashes and trailing dashes
-          cleanedHref = cleanedHref.replace(/-+/g, '-'); // Replace multiple dashes with a single dash
-          cleanedHref = cleanedHref.replace(/-$/g, '');  // Remove trailing dashes
+          // Remove any consecutive dashes, replace them with a single space
+          cleanedHref = cleanedHref.replace(/-+/g, ' ');
 
-          // Ensure that dashes are replaced by a single dash
-          cleanedHref = cleanedHref.replace(/\s+/g, '-');  // Replace spaces with hyphens
-          cleanedHref = cleanedHref.replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+          // Remove any leading/trailing dashes or spaces
+          cleanedHref = cleanedHref.trim().replace(/^-+|-+$/g, '');
 
-          // Log the cleaned URL
-          console.log(`Link ${index + 1}:`, cleanedHref);
+          // Get the movie title by taking the part before the year
+          const title = cleanedHref.split(' 2024')[0];
 
-          // Add the cleaned URL to the array for the text file
-          cleanedUrls.push(cleanedHref);
+          // Add the movie title and the original anchor href (URL) to separate lines
+          cleanedUrls.push(`${title} 2024`);
+          cleanedUrls.push(anchor.href); // Use the full anchor href directly
         }
       });
 
@@ -170,4 +169,3 @@ function downloadTextFile(urls) {
 
 // Call the function to execute
 grabAndCleanAnchorValues();
-
